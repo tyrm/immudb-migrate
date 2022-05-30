@@ -20,7 +20,7 @@ func WithTableName(table string) MigratorOption {
 
 func WithLocksTableName(table string) MigratorOption {
 	return func(m *Migrator) {
-		m.locksTable = table
+		m.lockKey = table
 	}
 }
 
@@ -31,7 +31,7 @@ type Migrator struct {
 	ms MigrationSlice
 
 	table        string
-	locksTable   string
+	lockKey      string
 	locksTableID int64
 }
 
@@ -42,8 +42,8 @@ func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorO
 
 		ms: migrations.ms,
 
-		table:      "immudb_migrations",
-		locksTable: "immudb_migration_locks",
+		table:   "immudb_migrations",
+		lockKey: "immudb_migration_lock",
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -136,7 +136,7 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 
 func (m *Migrator) Lock(ctx context.Context) error {
 	// check for lock
-	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.locksTable, m.table))
+	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.lockKey, m.table))
 	fmt.Printf("err fmt: %T", err)
 	if err != nil && err.Error() != KeyNotFoundError {
 		// error that isn't key not found
@@ -151,7 +151,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 	var preconditions []*schema.Precondition
 	if entry != nil {
 		precondition := schema.PreconditionKeyNotModifiedAfterTX(
-			keyTableMigrationLock(m.locksTable, m.table),
+			keyTableMigrationLock(m.lockKey, m.table),
 			entry.Tx,
 		)
 
@@ -159,7 +159,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 	}
 	_, err = m.immudb.SetAll(ctx, &schema.SetRequest{
 		KVs: []*schema.KeyValue{{
-			Key:   keyTableMigrationLock(m.locksTable, m.table),
+			Key:   keyTableMigrationLock(m.lockKey, m.table),
 			Value: []byte(StateLocked),
 		}},
 		Preconditions: preconditions,
@@ -173,7 +173,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 
 func (m *Migrator) Unlock(ctx context.Context) error {
 	// Without verification
-	tx, err := m.immudb.Set(ctx, keyTableMigrationLock(m.locksTable, m.table), []byte(StateUnlocked))
+	tx, err := m.immudb.Set(ctx, keyTableMigrationLock(m.lockKey, m.table), []byte(StateUnlocked))
 	if err != nil {
 		return fmt.Errorf("migrate: unlocking (%w)", err)
 	}
@@ -238,7 +238,7 @@ func (m *Migrator) selectAppliedMigrations(ctx context.Context) (MigrationSlice,
 
 		ms = append(ms, migration)
 	}
-	fmt.Printf("applied migration slices: %+v\n\n", resp)
+
 	return ms, nil
 }
 
@@ -246,5 +246,6 @@ func (m *Migrator) validate() error {
 	if len(m.ms) == 0 {
 		return errors.New("migrate: there are no any migrations")
 	}
+
 	return nil
 }

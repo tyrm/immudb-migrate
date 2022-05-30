@@ -6,14 +6,44 @@ import (
 	"testing"
 )
 
+func TestNewMigrations(t *testing.T) {
+	t.Parallel()
+
+	tables := []struct {
+		opts []MigrationsOption
+	}{
+		{[]MigrationsOption{}},
+	}
+
+	for i, table := range tables {
+		i := i
+		table := table
+
+		name := fmt.Sprintf("[%d] Running extractMigrationName", i)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			migrations := NewMigrations(table.opts...)
+
+			if !strings.Contains(migrations.implicitDirectory, "/go/src/testing") {
+				t.Errorf("NewMigrations returned invalid implicitDirectory, got: '%s', should contain: '%s'", migrations.implicitDirectory, "/go/src/testing")
+			}
+			if len(migrations.ms) != 0 {
+				t.Errorf("NewMigrations returned unexpected migrations, got: '%d', should contain: '%d'", len(migrations.ms), 0)
+			}
+		})
+	}
+}
+
 func TestMigrationFile(t *testing.T) {
+	t.Parallel()
+
 	if fpath := migrationFile(); !strings.Contains(fpath, "/go/src/testing/testing.go") {
 		t.Errorf("NewMigrations returned invalid path, got: '%s', should contain: '%s'", fpath, "/go/src/testing/testing.go")
 	}
 }
 
 func TestExtractMigrationName(t *testing.T) {
-	//
 	t.Parallel()
 
 	tables := []struct {
@@ -34,27 +64,28 @@ func TestExtractMigrationName(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			name, err := extractMigrationName(table.fpath)
+			migName, err := extractMigrationName(table.fpath)
 
-			if err == nil && table.err != nil {
+			switch {
+			case err == nil && table.err != nil:
 				// error was unexpectedly nil
 				t.Errorf("[%d] expected error, got: '%v', want: '%v'", i, err, table.err)
 
 				return
-			} else if err != nil && table.err == nil {
+			case err != nil && table.err == nil:
 				// expected nil error
 				t.Errorf("[%d] unexpected nil error, got: '%v', want: '%v'", i, err, table.err)
 
 				return
-			} else if err != nil && table.err != nil && err.Error() != table.err.Error() {
+			case err != nil && table.err != nil && err.Error() != table.err.Error():
 				// errors do not match
 				t.Errorf("[%d] invalid error, got: '%v', want: '%v'", i, err, table.err)
 
 				return
 			}
 
-			if name != table.name {
-				t.Errorf("[%d] invalid name, got: '%s', want: '%s'", i, name, table.name)
+			if migName != table.name {
+				t.Errorf("[%d] invalid name, got: '%s', want: '%s'", i, migName, table.name)
 			}
 		})
 	}

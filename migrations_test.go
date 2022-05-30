@@ -117,6 +117,17 @@ func TestMigrations_Add(t *testing.T) {
 	}
 }
 
+func TestMigrations_Add_Panic(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("should have paniced")
+		}
+	}()
+
+	migrations := Migrations{}
+	migrations.Add(Migration{})
+}
+
 func TestMigrations_Sorted(t *testing.T) {
 	t.Parallel()
 

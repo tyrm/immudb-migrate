@@ -8,23 +8,21 @@ import (
 
 //revive:disable:add-constant
 
-var (
-	testMigration1 = Migration{
-		Name: "20220506174128",
-	}
-	testMigration2 = Migration{
-		Name: "20220508174128",
-	}
-	testMigration3 = Migration{
-		Name: "20220504174128",
-	}
-	testMigration4 = Migration{
-		Name: "20220510174128",
-	}
-)
-
 func TestMigrationMap(t *testing.T) {
 	t.Parallel()
+
+	testMigration1 := Migration{
+		Name: "20220506174128",
+	}
+	testMigration2 := Migration{
+		Name: "20220508174128",
+	}
+	testMigration3 := Migration{
+		Name: "20220504174128",
+	}
+	testMigration4 := Migration{
+		Name: "20220510174128",
+	}
 
 	tables := []struct {
 		input  MigrationSlice
@@ -74,6 +72,19 @@ func TestMigrationMap(t *testing.T) {
 
 func TestSortAsc(t *testing.T) {
 	t.Parallel()
+
+	testMigration1 := Migration{
+		Name: "20220506174128",
+	}
+	testMigration2 := Migration{
+		Name: "20220508174128",
+	}
+	testMigration3 := Migration{
+		Name: "20220504174128",
+	}
+	testMigration4 := Migration{
+		Name: "20220510174128",
+	}
 
 	tables := []struct {
 		input  MigrationSlice

@@ -66,7 +66,7 @@ func migrationFile() string {
 			break
 		}
 		fmt.Printf("func: %s", f.Function)
-		if !strings.Contains(f.Function, "/migrations.") {
+		if !strings.Contains(f.Function, "/immudb-migrate.") {
 			return f.File
 		}
 	}

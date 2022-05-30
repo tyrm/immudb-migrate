@@ -1,7 +1,6 @@
 package migrate
 
 import (
-	"fmt"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -82,7 +81,7 @@ func extractMigrationName(fpath string) (string, error) {
 
 	matches := fnameRE.FindStringSubmatch(fname)
 	if matches == nil {
-		return "", fmt.Errorf("migrate: unsupported migrate name format: %q", fname)
+		return "", NewMigrationNameError("unsupported migrate name format", fname)
 	}
 
 	return matches[1], nil

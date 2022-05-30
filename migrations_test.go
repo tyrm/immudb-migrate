@@ -85,7 +85,7 @@ func TestMigrations_Add(t *testing.T) {
 		i := i
 		table := table
 
-		name := fmt.Sprintf("[%d] Running extractMigrationName", i)
+		name := fmt.Sprintf("[%d] Running Migrations.Add", i)
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -102,6 +102,82 @@ func TestMigrations_Add(t *testing.T) {
 
 			for j, eMig := range table.migrations {
 				oMig := migrations.ms[j]
+
+				if oMig.ID != eMig.ID {
+					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)
+				}
+				if oMig.Name != eMig.Name {
+					t.Errorf("[%d] invalid migration name at %d, got: '%+v', want: '%+v'", i, j, oMig.Name, eMig.Name)
+				}
+				if oMig.GroupID != eMig.GroupID {
+					t.Errorf("[%d] invalid migration group id at %d, got: '%d', want: '%d'", i, j, oMig.GroupID, eMig.GroupID)
+				}
+			}
+		})
+	}
+}
+
+func TestMigrations_Sorted(t *testing.T) {
+	t.Parallel()
+
+	tables := []struct {
+		migrations Migrations
+		slices     MigrationSlice
+	}{
+		{
+			Migrations{
+				ms: MigrationSlice{
+					testMigration2,
+					testMigration1,
+					testMigration4,
+					testMigration3,
+				},
+			},
+			MigrationSlice{
+				testMigration1,
+				testMigration2,
+				testMigration3,
+				testMigration4,
+			},
+		},
+		{
+			Migrations{
+				ms: MigrationSlice{
+					testMigration5,
+					testMigration4,
+					testMigration3,
+					testMigration2,
+					testMigration1,
+				},
+			},
+			MigrationSlice{
+				testMigration1,
+				testMigration2,
+				testMigration3,
+				testMigration4,
+				testMigration5,
+			},
+		},
+	}
+
+	for i, table := range tables {
+		i := i
+		table := table
+
+		name := fmt.Sprintf("[%d] Running Migrations.Sorted", i)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			migrations := table.migrations.Sorted()
+
+			if len(migrations) != len(table.slices) {
+				t.Errorf("[%d] invalid length, got: '%d', want: '%d'", i, len(migrations), len(table.slices))
+
+				return
+			}
+
+			for j, eMig := range table.slices {
+				oMig := migrations[j]
 
 				if oMig.ID != eMig.ID {
 					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)

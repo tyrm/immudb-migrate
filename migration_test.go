@@ -5,6 +5,34 @@ import (
 	"testing"
 )
 
+var (
+	testMigration1 = Migration{
+		ID:      1,
+		Name:    "20220504174129",
+		GroupID: 1,
+	}
+	testMigration2 = Migration{
+		ID:      2,
+		Name:    "20220506174129",
+		GroupID: 2,
+	}
+	testMigration3 = Migration{
+		ID:      3,
+		Name:    "20220508174129",
+		GroupID: 2,
+	}
+	testMigration4 = Migration{
+		ID:      4,
+		Name:    "20220510174129",
+		GroupID: 3,
+	}
+	testMigration5 = Migration{
+		ID:      5,
+		Name:    "20220512174129",
+		GroupID: 3,
+	}
+)
+
 func TestMigration_IsApplied(t *testing.T) {
 	t.Parallel()
 

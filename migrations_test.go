@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
+
+//revive:disable:add-constant
 
 func TestNewMigrations(t *testing.T) {
 	t.Parallel()
@@ -30,6 +33,85 @@ func TestNewMigrations(t *testing.T) {
 			}
 			if len(migrations.ms) != 0 {
 				t.Errorf("NewMigrations returned unexpected migrations, got: '%d', should contain: '%d'", len(migrations.ms), 0)
+			}
+		})
+	}
+}
+
+func TestMigrations_Add(t *testing.T) {
+	t.Parallel()
+
+	tables := []struct {
+		migrations []Migration
+	}{
+		{
+			[]Migration{},
+		},
+		{
+			[]Migration{
+				{
+					ID:         1,
+					Name:       "20220506174129",
+					GroupID:    1,
+					MigratedAt: time.Date(2022, 05, 30, 16, 04, 27, 0, time.UTC),
+				},
+			},
+		},
+		{
+			[]Migration{
+				{
+					ID:         1,
+					Name:       "20220506174129",
+					GroupID:    1,
+					MigratedAt: time.Date(2022, 05, 30, 16, 04, 27, 0, time.UTC),
+				},
+				{
+					ID:         2,
+					Name:       "20220508174129",
+					GroupID:    2,
+					MigratedAt: time.Date(2022, 05, 30, 16, 04, 28, 0, time.UTC),
+				},
+				{
+					ID:         3,
+					Name:       "20220510174129",
+					GroupID:    2,
+					MigratedAt: time.Date(2022, 05, 30, 16, 04, 29, 0, time.UTC),
+				},
+			},
+		},
+	}
+
+	for i, table := range tables {
+		i := i
+		table := table
+
+		name := fmt.Sprintf("[%d] Running extractMigrationName", i)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			migrations := Migrations{}
+			for _, m := range table.migrations {
+				migrations.Add(m)
+			}
+
+			if len(migrations.ms) != len(table.migrations) {
+				t.Errorf("[%d] invalid length, got: '%d', want: '%d'", i, len(migrations.ms), len(table.migrations))
+
+				return
+			}
+
+			for j, eMig := range table.migrations {
+				oMig := migrations.ms[j]
+
+				if oMig.ID != eMig.ID {
+					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)
+				}
+				if oMig.Name != eMig.Name {
+					t.Errorf("[%d] invalid migration name at %d, got: '%+v', want: '%+v'", i, j, oMig.Name, eMig.Name)
+				}
+				if oMig.GroupID != eMig.GroupID {
+					t.Errorf("[%d] invalid migration group id at %d, got: '%d', want: '%d'", i, j, oMig.GroupID, eMig.GroupID)
+				}
 			}
 		})
 	}
@@ -90,3 +172,5 @@ func TestExtractMigrationName(t *testing.T) {
 		})
 	}
 }
+
+//revive:enable:add-constant

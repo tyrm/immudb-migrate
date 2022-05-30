@@ -5,12 +5,18 @@ import (
 	"time"
 )
 
+const (
+	microsecondsToSeconds     = 1000000
+	microsecondsToNanoseconds = 1000
+)
+
 func migrationMap(ms MigrationSlice) map[string]*Migration {
 	mp := make(map[string]*Migration)
 	for i := range ms {
 		m := &ms[i]
 		mp[m.Name] = m
 	}
+
 	return mp
 }
 
@@ -21,8 +27,8 @@ func sortAsc(ms MigrationSlice) {
 }
 
 func tsToTime(ts int64) time.Time {
-	sec := ts / 1000000
-	ns := (ts % 1000000) * 1000
+	sec := ts / microsecondsToSeconds
+	ns := (ts % microsecondsToSeconds) * microsecondsToNanoseconds
 
 	return time.Unix(sec, ns).UTC()
 }

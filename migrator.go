@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/codenotary/immudb/pkg/api/schema"
 	"github.com/codenotary/immudb/pkg/client"
-	"log"
 )
 
 type MigratorOption func(m *Migrator)
@@ -29,9 +30,8 @@ type Migrator struct {
 
 	ms MigrationSlice
 
-	table        string
-	lockKey      string
-	locksTableID int64
+	table   string
+	lockKey string
 }
 
 func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorOption) *Migrator {
@@ -47,6 +47,7 @@ func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorO
 	for _, opt := range opts {
 		opt(m)
 	}
+
 	return m
 }
 

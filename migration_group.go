@@ -15,5 +15,6 @@ func (g *MigrationGroup) String() string {
 	if g.IsZero() {
 		return "nil"
 	}
+
 	return fmt.Sprintf("group #%d (%s)", g.ID, g.Migrations)
 }

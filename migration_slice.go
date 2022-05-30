@@ -20,9 +20,9 @@ func (ms MigrationSlice) String() string {
 
 	for i := range ms {
 		if i > 0 {
-			sb.WriteString(", ")
+			sb.WriteString(", ") //nolint
 		}
-		sb.WriteString(ms[i].Name)
+		sb.WriteString(ms[i].Name) //nolint
 	}
 
 	return sb.String()
@@ -38,6 +38,7 @@ func (ms MigrationSlice) LastGroupID() int64 {
 			lastGroupID = groupID
 		}
 	}
+
 	return lastGroupID
 }
 
@@ -51,5 +52,6 @@ func (ms MigrationSlice) Unapplied() MigrationSlice {
 		}
 	}
 	sortAsc(unapplied)
+
 	return unapplied
 }

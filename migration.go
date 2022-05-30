@@ -2,8 +2,9 @@ package migrate
 
 import (
 	"context"
-	"github.com/codenotary/immudb/pkg/client"
 	"time"
+
+	"github.com/codenotary/immudb/pkg/client"
 )
 
 type MigrationHandler func(ctx context.Context, db client.ImmuClient) error

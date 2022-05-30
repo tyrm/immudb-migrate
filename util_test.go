@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+//revive:disable:add-constant
+
 var (
 	testMigration1 = Migration{
 		Name: "20220506174128",
@@ -131,9 +133,11 @@ func TestTsToTime(t *testing.T) {
 			t.Parallel()
 
 			newTime := tsToTime(table.ts)
-			if newTime != table.time {
+			if !newTime.Equal(table.time) {
 				t.Errorf("[%d] invalid time, got: '%s', want: '%s'", i, newTime, table.time)
 			}
 		})
 	}
 }
+
+//revive:enable:add-constant

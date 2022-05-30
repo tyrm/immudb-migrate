@@ -16,6 +16,7 @@ func NewMigrations(opts ...MigrationsOption) *Migrations {
 		opt(m)
 	}
 	m.implicitDirectory = filepath.Dir(migrationFile())
+
 	return m
 }
 
@@ -51,6 +52,7 @@ func (m *Migrations) Sorted() MigrationSlice {
 	migrations := make(MigrationSlice, len(m.ms))
 	copy(migrations, m.ms)
 	sortAsc(migrations)
+
 	return migrations
 }
 

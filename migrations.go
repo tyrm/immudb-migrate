@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 )
 
 type MigrationsOption func(m *Migrations)
@@ -64,7 +65,8 @@ func migrationFile() string {
 		if !ok {
 			break
 		}
-		if f.Function != "migrations.go" {
+		fmt.Printf("func: %s", f.Function)
+		if !strings.Contains(f.Function, "/migrations.") {
 			return f.File
 		}
 	}

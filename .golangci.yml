@@ -3,8 +3,6 @@ linters-settings:
   ireturn:
     allow:
       - error
-      - github.com\/feditools\/go-lib\/template\.ActivableSlice
-      - github.com\/feditools\/go-lib\/metrics\..*
   revive:
     rules:
       # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#add-constant

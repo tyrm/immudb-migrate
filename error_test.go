@@ -6,11 +6,13 @@ import (
 	"testing"
 )
 
+//revive:disable:add-constant
+
 var (
-	testErr1         = errors.New("test error 1")
-	testRollbackErr1 = errors.New("rollback test error 1")
-	testTopErr1      = errors.New("top test error 1")
-	testTopErr2      = errors.New("top test error 2")
+	testErr1         = errors.New("test error 1")          // nolint
+	testRollbackErr1 = errors.New("rollback test error 1") // nolint
+	testTopErr1      = errors.New("top test error 1")      // nolint
+	testTopErr2      = errors.New("top test error 2")      // nolint
 )
 
 func TestNewLockError(t *testing.T) {
@@ -199,3 +201,5 @@ func TestRollbackError_Error(t *testing.T) {
 		})
 	}
 }
+
+//revive:disable:add-constant

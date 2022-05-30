@@ -57,17 +57,28 @@ func TestMigrationMap(t *testing.T) {
 
 			output := migrationMap(table.input)
 
-			j := 0
-			for k := range output {
-				if k != table.input[j].Name {
-					t.Errorf("[%d] invalid key at %d, got: '%s', want: '%s'", i, j, k, table.input[j].Name)
+			// check length
+			if len(output) != len(table.input) {
+				t.Errorf("[%d] invalid length, got: '%d', want: '%d'", i, len(output), len(table.input))
+			}
+
+			// check output map
+			for keyMig, eMig := range table.output {
+				oMig, ok := output[keyMig]
+				if !ok {
+					t.Errorf("[%d] missing migration: '%s'", i, keyMig)
+					break
 				}
 
-				if output[k].Name != table.input[j].Name {
-					t.Errorf("[%d] invalid migration at %d, got: '%s', want: '%s'", i, j, output[k].Name, table.input[j].Name)
+				if oMig.ID != eMig.ID {
+					t.Errorf("[%d] invalid migration id at %s, got: '%d', want: '%d'", i, keyMig, oMig.ID, eMig.ID)
 				}
-
-				j++
+				if oMig.Name != eMig.Name {
+					t.Errorf("[%d] invalid migration name at %s, got: '%+v', want: '%+v'", i, keyMig, oMig.Name, eMig.Name)
+				}
+				if oMig.GroupID != eMig.GroupID {
+					t.Errorf("[%d] invalid migration group id at %s, got: '%d', want: '%d'", i, keyMig, oMig.GroupID, eMig.GroupID)
+				}
 			}
 		})
 	}

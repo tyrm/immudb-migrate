@@ -220,7 +220,7 @@ func (m *Migrator) selectAppliedMigrations(ctx context.Context) (MigrationSlice,
 
 	var ms MigrationSlice
 	for _, row := range resp.GetRows() {
-		migratedAt := row.GetValues()[2].GetTs()
+		migratedAt := row.GetValues()[3].GetTs()
 
 		migratedAtSec := migratedAt / 1000000
 		migratedAtNSec := (migratedAt % 1000000) * 1000

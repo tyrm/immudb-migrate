@@ -137,9 +137,8 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 func (m *Migrator) Lock(ctx context.Context) error {
 	// check for lock
 	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.lockKey, m.table))
-	fmt.Printf("err fmt: %T", err)
 	if err != nil && err.Error() != KeyNotFoundError {
-		// error that isn't key not found
+		// error that isn't 'key not found'
 		return fmt.Errorf("migrate: migrations table is already locked (%w)", err)
 	}
 	if entry != nil && string(entry.Value) == StateLocked {

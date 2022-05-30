@@ -15,9 +15,9 @@ func WithTableName(table string) MigratorOption {
 	}
 }
 
-func WithLocksTableName(table string) MigratorOption {
+func WithLocksKeyName(table string) MigratorOption {
 	return func(m *Migrator) {
-		m.lockKey = table
+		m.locksKey = table
 	}
 }
 
@@ -27,8 +27,8 @@ type Migrator struct {
 
 	ms MigrationSlice
 
-	table   string
-	lockKey string
+	table    string
+	locksKey string
 }
 
 func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorOption) *Migrator {
@@ -38,8 +38,8 @@ func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorO
 
 		ms: migrations.ms,
 
-		table:   "immudb_migrations",
-		lockKey: "immudb_migration_lock",
+		table:    "immudb_migrations",
+		locksKey: "immudb_migration_lock",
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -133,7 +133,7 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 
 func (m *Migrator) Lock(ctx context.Context) error {
 	// check for lock
-	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.lockKey, m.table))
+	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.locksKey, m.table))
 	if err != nil && err.Error() != KeyNotFoundError {
 		// error that isn't 'key not found'
 		return NewLockError("migrations table is already locked", err)
@@ -147,7 +147,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 	var preconditions []*schema.Precondition
 	if entry != nil {
 		precondition := schema.PreconditionKeyNotModifiedAfterTX(
-			keyTableMigrationLock(m.lockKey, m.table),
+			keyTableMigrationLock(m.locksKey, m.table),
 			entry.Tx,
 		)
 
@@ -155,7 +155,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 	}
 	_, err = m.immudb.SetAll(ctx, &schema.SetRequest{
 		KVs: []*schema.KeyValue{{
-			Key:   keyTableMigrationLock(m.lockKey, m.table),
+			Key:   keyTableMigrationLock(m.locksKey, m.table),
 			Value: []byte(StateLocked),
 		}},
 		Preconditions: preconditions,
@@ -169,7 +169,7 @@ func (m *Migrator) Lock(ctx context.Context) error {
 
 func (m *Migrator) Unlock(ctx context.Context) error {
 	// Without verification
-	_, err := m.immudb.Set(ctx, keyTableMigrationLock(m.lockKey, m.table), []byte(StateUnlocked))
+	_, err := m.immudb.Set(ctx, keyTableMigrationLock(m.locksKey, m.table), []byte(StateUnlocked))
 	if err != nil {
 		return NewLockError("can't unlock migration table", err)
 	}

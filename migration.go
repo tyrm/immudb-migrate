@@ -18,10 +18,10 @@ type Migration struct {
 	Up MigrationHandler
 }
 
-func (m *Migration) String() string {
-	return m.Name
-}
-
 func (m *Migration) IsApplied() bool {
 	return m.ID > 0
+}
+
+func (m *Migration) String() string {
+	return m.Name
 }

@@ -67,6 +67,7 @@ func TestMigrationMap(t *testing.T) {
 				oMig, ok := output[keyMig]
 				if !ok {
 					t.Errorf("[%d] missing migration: '%s'", i, keyMig)
+
 					break
 				}
 

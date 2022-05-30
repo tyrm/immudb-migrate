@@ -55,8 +55,6 @@ func (m *Migrator) Init(ctx context.Context) error {
 	// prep statements
 	statements := []string{
 		createTableMigrations(m.table),
-		createTableMigrationLocks(m.locksTable),
-		createIndexMigrationLocks(m.locksTable),
 	}
 
 	// create transaction

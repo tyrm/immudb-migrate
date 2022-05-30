@@ -1,6 +1,9 @@
 package migrate
 
-import "sort"
+import (
+	"sort"
+	"time"
+)
 
 func migrationMap(ms MigrationSlice) map[string]*Migration {
 	mp := make(map[string]*Migration)
@@ -15,4 +18,11 @@ func sortAsc(ms MigrationSlice) {
 	sort.Slice(ms, func(i, j int) bool {
 		return ms[i].Name < ms[j].Name
 	})
+}
+
+func tsToTime(ts int64) time.Time {
+	sec := ts / 1000000
+	ns := (ts % 1000000) * 1000
+
+	return time.Unix(sec, ns).UTC()
 }

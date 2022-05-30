@@ -7,7 +7,6 @@ import (
 	"github.com/codenotary/immudb/pkg/api/schema"
 	"github.com/codenotary/immudb/pkg/client"
 	"log"
-	"time"
 )
 
 type MigratorOption func(m *Migrator)
@@ -216,23 +215,13 @@ func (m *Migrator) selectAppliedMigrations(ctx context.Context) (MigrationSlice,
 		return nil, err
 	}
 
-	fmt.Printf("applied migrations: %+v\n\n", resp)
-
 	var ms MigrationSlice
 	for _, row := range resp.GetRows() {
-		migratedAt := row.GetValues()[3].GetTs()
-
-		migratedAtSec := migratedAt / 1000000
-		migratedAtNSec := (migratedAt % 1000000) * 1000
-
-		fmt.Printf("ts: %d, sec: %d nsec: %d\n\n", migratedAt, migratedAtSec, migratedAtNSec)
-		migratedAtT := time.Unix(migratedAtSec, migratedAtNSec)
-
 		migration := Migration{
 			ID:         row.GetValues()[0].GetN(),
 			Name:       row.GetValues()[1].GetS(),
 			GroupID:    row.GetValues()[2].GetN(),
-			MigratedAt: migratedAtT,
+			MigratedAt: tsToTime(row.GetValues()[3].GetTs()),
 		}
 
 		ms = append(ms, migration)

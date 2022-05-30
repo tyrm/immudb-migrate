@@ -11,35 +11,38 @@ import (
 func TestMigrationMap(t *testing.T) {
 	t.Parallel()
 
-	testMigration1 := Migration{
-		Name: "20220506174128",
-	}
-	testMigration2 := Migration{
-		Name: "20220508174128",
-	}
-	testMigration3 := Migration{
-		Name: "20220504174128",
-	}
-	testMigration4 := Migration{
-		Name: "20220510174128",
-	}
-
 	tables := []struct {
 		input  MigrationSlice
 		output map[string]*Migration
 	}{
 		{
 			input: MigrationSlice{
-				testMigration1,
-				testMigration2,
-				testMigration3,
-				testMigration4,
+				Migration{
+					Name: "20220506174128",
+				},
+				Migration{
+					Name: "20220508174128",
+				},
+				Migration{
+					Name: "20220504174128",
+				},
+				Migration{
+					Name: "20220510174128",
+				},
 			},
 			output: map[string]*Migration{
-				testMigration1.Name: &testMigration1,
-				testMigration2.Name: &testMigration2,
-				testMigration3.Name: &testMigration3,
-				testMigration4.Name: &testMigration4,
+				"20220506174128": {
+					Name: "20220506174128",
+				},
+				"20220508174128": {
+					Name: "20220508174128",
+				},
+				"20220504174128": {
+					Name: "20220504174128",
+				},
+				"20220510174128": {
+					Name: "20220510174128",
+				},
 			},
 		},
 	}
@@ -73,35 +76,38 @@ func TestMigrationMap(t *testing.T) {
 func TestSortAsc(t *testing.T) {
 	t.Parallel()
 
-	testMigration1 := Migration{
-		Name: "20220506174128",
-	}
-	testMigration2 := Migration{
-		Name: "20220508174128",
-	}
-	testMigration3 := Migration{
-		Name: "20220504174128",
-	}
-	testMigration4 := Migration{
-		Name: "20220510174128",
-	}
-
 	tables := []struct {
 		input  MigrationSlice
 		output MigrationSlice
 	}{
 		{
 			input: MigrationSlice{
-				testMigration1,
-				testMigration2,
-				testMigration3,
-				testMigration4,
+				Migration{
+					Name: "20220506174128",
+				},
+				Migration{
+					Name: "20220508174128",
+				},
+				Migration{
+					Name: "20220504174128",
+				},
+				Migration{
+					Name: "20220510174128",
+				},
 			},
 			output: MigrationSlice{
-				testMigration3,
-				testMigration1,
-				testMigration2,
-				testMigration4,
+				Migration{
+					Name: "20220504174128",
+				},
+				Migration{
+					Name: "20220506174128",
+				},
+				Migration{
+					Name: "20220508174128",
+				},
+				Migration{
+					Name: "20220510174128",
+				},
 			},
 		},
 	}

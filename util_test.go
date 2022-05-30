@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestProcessPostgresError(t *testing.T) {
+func TestTsToTime(t *testing.T) {
 	tables := []struct {
 		ts   int64
 		time time.Time

@@ -6,6 +6,8 @@ import (
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
+//revive:disable:add-constant
+
 const testCreateTableMigrations = `
 CREATE TABLE IF NOT EXISTS immudb_migrations (
     id          INTEGER AUTO_INCREMENT,
@@ -62,3 +64,5 @@ func TestSelectAppliedTableMigrations(t *testing.T) {
 		t.Errorf("invalid statement:\n%s", dmp.DiffPrettyText(diffs))
 	}
 }
+
+//revive:enable:add-constant

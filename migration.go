@@ -7,7 +7,7 @@ import (
 	"github.com/codenotary/immudb/pkg/client"
 )
 
-type MigrationHandler func(ctx context.Context, db client.ImmuClient) error
+type MigrationHandler func(ctx context.Context, db client.Tx) error
 
 type Migration struct {
 	ID         int64

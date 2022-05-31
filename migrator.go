@@ -114,17 +114,29 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 		migration := &migrations[i]
 		migration.GroupID = group.ID
 
-		// Always mark migration as applied so the rollback has a chance to fix the database.
-		if err := m.MarkApplied(ctx, migration); err != nil {
-			return group, err
-		}
-
 		group.Migrations = migrations[:i+1]
 
 		if !cfg.nop && migration.Up != nil {
-			if err := migration.Up(ctx, m.immudb); err != nil {
+			// create transaction
+			tx, err := m.immudb.NewTx(ctx)
+			if err != nil {
 				return group, err
 			}
+
+			// run migration
+			if err := migration.Up(ctx, tx); err != nil {
+				return group, Rollback(ctx, tx, err)
+			}
+
+			// commit
+			_, err = tx.Commit(ctx)
+			if err != nil {
+				return group, err
+			}
+		}
+
+		if err := m.MarkApplied(ctx, migration); err != nil {
+			return group, err
 		}
 	}
 

@@ -138,7 +138,6 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 		if err := m.MarkApplied(ctx, migration); err != nil {
 			return group, err
 		}
-
 	}
 
 	return group, nil

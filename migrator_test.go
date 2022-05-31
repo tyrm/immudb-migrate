@@ -208,8 +208,14 @@ func TestMigrator_Validate(t *testing.T) {
 			ErrNoNewMigrations,
 		},
 		{
-			Migrator{},
-			ErrNoNewMigrations,
+			Migrator{
+				ms: MigrationSlice{
+					testMigration1,
+					testMigration2,
+					testMigration3,
+				},
+			},
+			nil,
 		},
 	}
 

@@ -31,6 +31,17 @@ var (
 		Name:    "20220512174129",
 		GroupID: 3,
 	}
+	testMigration6 = Migration{
+		ID:      6,
+		Name:    "20220514174129",
+		GroupID: 3,
+	}
+	testMigration7 = Migration{
+		Name: "20220516174129",
+	}
+	testMigration8 = Migration{
+		Name: "20220518174129",
+	}
 )
 
 func TestMigration_IsApplied(t *testing.T) {

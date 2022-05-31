@@ -3,7 +3,7 @@ package migrate
 import "fmt"
 
 const createTableMigrationsStatement = `
-CREATE TABLE IF NOT EXISTS %s(
+CREATE TABLE IF NOT EXISTS %s (
     id          INTEGER AUTO_INCREMENT,
     name        VARCHAR,
     group_id    INTEGER,

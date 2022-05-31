@@ -2,11 +2,9 @@ package migrate
 
 import (
 	"context"
-	"errors"
-	"fmt"
+
 	"github.com/codenotary/immudb/pkg/api/schema"
 	"github.com/codenotary/immudb/pkg/client"
-	"log"
 )
 
 type MigratorOption func(m *Migrator)
@@ -17,9 +15,9 @@ func WithTableName(table string) MigratorOption {
 	}
 }
 
-func WithLocksTableName(table string) MigratorOption {
+func WithLocksKeyName(table string) MigratorOption {
 	return func(m *Migrator) {
-		m.lockKey = table
+		m.locksKey = table
 	}
 }
 
@@ -29,9 +27,8 @@ type Migrator struct {
 
 	ms MigrationSlice
 
-	table        string
-	lockKey      string
-	locksTableID int64
+	table    string
+	locksKey string
 }
 
 func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorOption) *Migrator {
@@ -41,12 +38,13 @@ func NewMigrator(db client.ImmuClient, migrations *Migrations, opts ...MigratorO
 
 		ms: migrations.ms,
 
-		table:   "immudb_migrations",
-		lockKey: "immudb_migration_lock",
+		table:    "immudb_migrations",
+		locksKey: "immudb_migration_lock",
 	}
 	for _, opt := range opts {
 		opt(m)
 	}
+
 	return m
 }
 
@@ -135,21 +133,21 @@ func (m *Migrator) Migrate(ctx context.Context, opts ...MigrationOption) (*Migra
 
 func (m *Migrator) Lock(ctx context.Context) error {
 	// check for lock
-	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.lockKey, m.table))
+	entry, err := m.immudb.Get(ctx, keyTableMigrationLock(m.locksKey, m.table))
 	if err != nil && err.Error() != KeyNotFoundError {
 		// error that isn't 'key not found'
-		return fmt.Errorf("migrate: migrations table is already locked (%w)", err)
+		return NewLockError("migrations table is already locked", err)
 	}
 	if entry != nil && string(entry.Value) == StateLocked {
 		// entry is locked
-		return errors.New("migrate: migrations table is already locked")
+		return NewLockError("migrations table is already locked", nil)
 	}
 
 	// set lock
 	var preconditions []*schema.Precondition
 	if entry != nil {
 		precondition := schema.PreconditionKeyNotModifiedAfterTX(
-			keyTableMigrationLock(m.lockKey, m.table),
+			keyTableMigrationLock(m.locksKey, m.table),
 			entry.Tx,
 		)
 
@@ -157,13 +155,13 @@ func (m *Migrator) Lock(ctx context.Context) error {
 	}
 	_, err = m.immudb.SetAll(ctx, &schema.SetRequest{
 		KVs: []*schema.KeyValue{{
-			Key:   keyTableMigrationLock(m.lockKey, m.table),
+			Key:   keyTableMigrationLock(m.locksKey, m.table),
 			Value: []byte(StateLocked),
 		}},
 		Preconditions: preconditions,
 	})
 	if err != nil {
-		return fmt.Errorf("migrate: migrations table is already locked (%w)", err)
+		return NewLockError("migrations table is already locked", err)
 	}
 
 	return nil
@@ -171,11 +169,10 @@ func (m *Migrator) Lock(ctx context.Context) error {
 
 func (m *Migrator) Unlock(ctx context.Context) error {
 	// Without verification
-	tx, err := m.immudb.Set(ctx, keyTableMigrationLock(m.lockKey, m.table), []byte(StateUnlocked))
+	_, err := m.immudb.Set(ctx, keyTableMigrationLock(m.locksKey, m.table), []byte(StateUnlocked))
 	if err != nil {
-		return fmt.Errorf("migrate: unlocking (%w)", err)
+		return NewLockError("can't unlock migration table", err)
 	}
-	log.Printf("Set: tx: %d", tx.Id)
 
 	return nil
 }
@@ -232,7 +229,7 @@ func (m *Migrator) selectAppliedMigrations(ctx context.Context) (MigrationSlice,
 
 func (m *Migrator) validate() error {
 	if len(m.ms) == 0 {
-		return errors.New("migrate: there are no any migrations")
+		return ErrNoNewMigrations
 	}
 
 	return nil

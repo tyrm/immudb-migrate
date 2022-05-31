@@ -1,7 +1,6 @@
 package migrate
 
 import (
-	"fmt"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -16,6 +15,7 @@ func NewMigrations(opts ...MigrationsOption) *Migrations {
 		opt(m)
 	}
 	m.implicitDirectory = filepath.Dir(migrationFile())
+
 	return m
 }
 
@@ -51,6 +51,7 @@ func (m *Migrations) Sorted() MigrationSlice {
 	migrations := make(MigrationSlice, len(m.ms))
 	copy(migrations, m.ms)
 	sortAsc(migrations)
+
 	return migrations
 }
 
@@ -80,7 +81,7 @@ func extractMigrationName(fpath string) (string, error) {
 
 	matches := fnameRE.FindStringSubmatch(fname)
 	if matches == nil {
-		return "", fmt.Errorf("migrate: unsupported migrate name format: %q", fname)
+		return "", NewMigrationNameError("unsupported migrate name format", fname)
 	}
 
 	return matches[1], nil

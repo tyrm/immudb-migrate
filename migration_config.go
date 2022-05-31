@@ -9,6 +9,7 @@ func newMigrationConfig(opts []MigrationOption) *migrationConfig {
 	for _, opt := range opts {
 		opt(cfg)
 	}
+
 	return cfg
 }
 

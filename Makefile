@@ -1,5 +1,11 @@
 PROJECT_NAME=immudb-migrate
 
+check:
+	golangci-lint run
+
+check-fix:
+	golangci-lint run --fix
+
 fmt:
 	@echo formatting
 	@go fmt $(shell go list ./... | grep -v /vendor/)
@@ -10,4 +16,4 @@ test:  tidy fmt
 tidy:
 	go mod tidy -compat=1.17
 
-.PHONY: fmt test tidy
+.PHONY: check check-fix fmt test tidy

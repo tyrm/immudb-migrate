@@ -183,33 +183,8 @@ func TestNewMigrator(t *testing.T) {
 				return
 			}
 
-			for j, eMig := range table.output.migrations.ms {
-				oMig := migrator.migrations.ms[j]
-
-				if oMig.ID != eMig.ID {
-					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)
-				}
-				if oMig.Name != eMig.Name {
-					t.Errorf("[%d] invalid migration name at %d, got: '%+v', want: '%+v'", i, j, oMig.Name, eMig.Name)
-				}
-				if oMig.GroupID != eMig.GroupID {
-					t.Errorf("[%d] invalid migration group id at %d, got: '%d', want: '%d'", i, j, oMig.GroupID, eMig.GroupID)
-				}
-			}
-
-			for j, eMig := range table.output.ms {
-				oMig := migrator.ms[j]
-
-				if oMig.ID != eMig.ID {
-					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)
-				}
-				if oMig.Name != eMig.Name {
-					t.Errorf("[%d] invalid migration name at %d, got: '%+v', want: '%+v'", i, j, oMig.Name, eMig.Name)
-				}
-				if oMig.GroupID != eMig.GroupID {
-					t.Errorf("[%d] invalid migration group id at %d, got: '%d', want: '%d'", i, j, oMig.GroupID, eMig.GroupID)
-				}
-			}
+			testCompareMigrationSlice(t, i, migrator.migrations.ms, table.output.migrations.ms)
+			testCompareMigrationSlice(t, i, migrator.ms, table.output.ms)
 
 			if migrator.table != table.output.table {
 				t.Errorf("NewMigrator returned invalid table, got: '%s', want: '%s'", migrator.table, table.output.table)

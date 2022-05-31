@@ -236,19 +236,30 @@ func TestMigrationSlice_Unapplied(t *testing.T) {
 				return
 			}
 
-			for j, eMig := range table.output {
-				oMig := unapplied[j]
-
-				if oMig.ID != eMig.ID {
-					t.Errorf("[%d] invalid migration id at %d, got: '%d', want: '%d'", i, j, oMig.ID, eMig.ID)
-				}
-				if oMig.Name != eMig.Name {
-					t.Errorf("[%d] invalid migration name at %d, got: '%+v', want: '%+v'", i, j, oMig.Name, eMig.Name)
-				}
-				if oMig.GroupID != eMig.GroupID {
-					t.Errorf("[%d] invalid migration group id at %d, got: '%d', want: '%d'", i, j, oMig.GroupID, eMig.GroupID)
-				}
-			}
+			testCompareMigrationSlice(t, i, unapplied, table.output)
 		})
+	}
+}
+
+func testCompareMigrationSlice(t *testing.T, run int, got, want MigrationSlice) {
+	t.Helper()
+
+	runStr := ""
+	if run > 0 {
+		runStr = fmt.Sprintf("[%d] ", run)
+	}
+
+	for i, eMig := range want {
+		oMig := got[i]
+
+		if oMig.ID != eMig.ID {
+			t.Errorf("%sinvalid migration id at %d, got: '%d', want: '%d'", runStr, i, oMig.ID, eMig.ID)
+		}
+		if oMig.Name != eMig.Name {
+			t.Errorf("%sinvalid migration name at %d, got: '%+v', want: '%+v'", runStr, i, oMig.Name, eMig.Name)
+		}
+		if oMig.GroupID != eMig.GroupID {
+			t.Errorf("%sinvalid migration group id at %d, got: '%d', want: '%d'", runStr, i, oMig.GroupID, eMig.GroupID)
+		}
 	}
 }

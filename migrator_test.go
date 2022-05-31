@@ -196,4 +196,38 @@ func TestNewMigrator(t *testing.T) {
 	}
 }
 
+func TestMigrator_Validate(t *testing.T) {
+	t.Parallel()
+
+	tables := []struct {
+		input Migrator
+		err   error
+	}{
+		{
+			Migrator{},
+			ErrNoNewMigrations,
+		},
+		{
+			Migrator{},
+			ErrNoNewMigrations,
+		},
+	}
+
+	for i, table := range tables {
+		i := i
+		table := table
+
+		name := fmt.Sprintf("[%d] Running NewMigrator", i)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			err := table.input.validate()
+
+			if !testCompareErrors(t, i, err, table.err) {
+				return
+			}
+		})
+	}
+}
+
 //revive:enable:add-constant

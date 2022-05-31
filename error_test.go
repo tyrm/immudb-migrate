@@ -202,4 +202,33 @@ func TestRollbackError_Error(t *testing.T) {
 	}
 }
 
+func testCompareErrors(t *testing.T, run int, got, want error) (success bool) {
+	t.Helper()
+
+	runStr := ""
+	if run > 0 {
+		runStr = fmt.Sprintf("[%d] ", run)
+	}
+
+	switch {
+	case got == nil && want != nil:
+		// error was unexpectedly nil
+		t.Errorf("%sexpected error, got: '%v', want: '%v'", runStr, got, want)
+
+		return false
+	case got != nil && want == nil:
+		// expected nil error
+		t.Errorf("%sunexpected nil error, got: '%v', want: '%v'", runStr, got, want)
+
+		return false
+	case got != nil && want != nil && got.Error() != want.Error():
+		// errors do not match
+		t.Errorf("%sinvalid error, got: '%v', want: '%v'", runStr, got, want)
+
+		return false
+	default:
+		return true
+	}
+}
+
 //revive:disable:add-constant

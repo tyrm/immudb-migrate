@@ -235,21 +235,7 @@ func TestExtractMigrationName(t *testing.T) {
 
 			migName, err := extractMigrationName(table.fpath)
 
-			switch {
-			case err == nil && table.err != nil:
-				// error was unexpectedly nil
-				t.Errorf("[%d] expected error, got: '%v', want: '%v'", i, err, table.err)
-
-				return
-			case err != nil && table.err == nil:
-				// expected nil error
-				t.Errorf("[%d] unexpected nil error, got: '%v', want: '%v'", i, err, table.err)
-
-				return
-			case err != nil && table.err != nil && err.Error() != table.err.Error():
-				// errors do not match
-				t.Errorf("[%d] invalid error, got: '%v', want: '%v'", i, err, table.err)
-
+			if !testCompareErrors(t, i, err, table.err) {
 				return
 			}
 

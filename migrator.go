@@ -76,10 +76,15 @@ func (m *Migrator) Init(ctx context.Context) error {
 
 // MarkApplied marks the migration as applied (completed).
 func (m *Migrator) MarkApplied(ctx context.Context, migration *Migration) error {
+	params := map[string]interface{}{
+		tableMigrationsColumnNameName:    migration.Name,
+		tableMigrationsColumnNameGroupID: migration.GroupID,
+	}
+
 	_, err := m.immudb.SQLExec(
 		ctx,
-		insertTableMigration(m.table, migration.Name, migration.GroupID),
-		nil,
+		insertTableMigration(m.table),
+		params,
 	)
 
 	return err
@@ -227,10 +232,10 @@ func (m *Migrator) selectAppliedMigrations(ctx context.Context) (MigrationSlice,
 	var ms MigrationSlice
 	for _, row := range resp.GetRows() {
 		migration := Migration{
-			ID:         row.GetValues()[0].GetN(),
-			Name:       row.GetValues()[1].GetS(),
-			GroupID:    row.GetValues()[2].GetN(),
-			MigratedAt: tsToTime(row.GetValues()[3].GetTs()),
+			ID:         row.GetValues()[tableMigrationsColumnIndexID].GetN(),
+			Name:       row.GetValues()[tableMigrationsColumnIndexName].GetS(),
+			GroupID:    row.GetValues()[tableMigrationsColumnIndexGroupID].GetN(),
+			MigratedAt: tsToTime(row.GetValues()[tableMigrationsColumnIndexMigratedAt].GetTs()),
 		}
 
 		ms = append(ms, migration)

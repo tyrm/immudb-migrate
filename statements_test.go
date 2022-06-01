@@ -10,9 +10,9 @@ import (
 
 const testCreateTableMigrations = `
 CREATE TABLE IF NOT EXISTS immudb_migrations (
-    id          INTEGER AUTO_INCREMENT,
-    name        VARCHAR,
-    group_id    INTEGER,
+    id INTEGER AUTO_INCREMENT,
+    name VARCHAR,
+    group_id INTEGER,
     migrated_at TIMESTAMP,
     PRIMARY KEY (id)
 );`
@@ -35,13 +35,13 @@ INSERT INTO immudb_migrations (
     migrated_at
 )
 VALUES (
-    '20220506174128',
-    1,
+    @name,
+    @group_id,
     NOW()
 );`
 
 func TestInsertTableMigration(t *testing.T) {
-	result := insertTableMigration("immudb_migrations", "20220506174128", 1)
+	result := insertTableMigration("immudb_migrations")
 
 	if result != testInsertTableMigration {
 		dmp := diffmatchpatch.New()

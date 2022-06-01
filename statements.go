@@ -7,7 +7,9 @@ const (
 	tableMigrationsColumnNameName       = "name"
 	tableMigrationsColumnNameGroupID    = "group_id"
 	tableMigrationsColumnNameMigratedAt = "migrated_at"
+)
 
+const (
 	tableMigrationsColumnIndexID int64 = iota
 	tableMigrationsColumnIndexName
 	tableMigrationsColumnIndexGroupID
